@@ -1,7 +1,7 @@
-# Terraform's Plugin Protocol
+# How Terraform Uses Plugins
 
-Terraform plugins (= Providers, for now [^1]) communicate with Terraform Core
-(= the command-line app [^1]) via a variant of the
+Terraform plugins (= providers, for now [^1]) communicate with Terraform Core
+(= the command-line app) via a variant of the
 [RPCPlugin "protocol"](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md).[^2][^3][^4]
 The reference implementation of this protocol is the
 [go-plugin](https://github.com/hashicorp/go-plugin) Go package. I don't know of
@@ -15,11 +15,11 @@ under different language / library constraints.
 ### Downloading plugins
 
 This is actually not part of RPCPlugin, but it's important for Terraform
-anyway: Users of Terraform request that Terraform load certain Providers by
-putting [Provider Requirements](https://developer.hashicorp.com/terraform/language/providers/requirements)
+anyway: Users of Terraform request that Terraform load certain providers by
+putting [provider requirements](https://developer.hashicorp.com/terraform/language/providers/requirements)
 in their Terraform files.
 During `terraform init`, Terraform attempts to download them from the official
-registry, although private registries can be used instead. During Provider
+registry, although private registries can be used instead. During provider
 development, one should specify
 [Development Overrides](https://developer.hashicorp.com/terraform/cli/config/config-file#development-overrides-for-provider-developers)
 in one's Terraform CLI config instead.
@@ -144,7 +144,7 @@ and further usage in Terraform's source code might be useful, too.
 ## Step 4: Higher-level stuff
 
 This part I'm not so sure about, but I guess there are higher-level rules for
-how a Provider must behave that also don't really have a spec. Perhaps the
+how a provider must behave that also don't really have a spec. Perhaps the
 implementation and documentation for [Terraform's Plugin
 Framework](https://developer.hashicorp.com/terraform/plugin/framework) will
 have some/most of the info.
