@@ -1,14 +1,28 @@
-# How Terraform Uses Plugins
+# How difficult is it to write a Terraform provider in a language other than Go?
 
-Terraform plugins (= providers, for now [^1]) communicate with Terraform Core
-(= the command-line app) via a variant of the
-[RPCPlugin "protocol"](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md).[^2][^3][^4]
-The reference implementation of this protocol is the
-[go-plugin](https://github.com/hashicorp/go-plugin) Go package. I don't know of
-any other implementations, hence the need for this document.
+Terraform's documentation on writing new providers
+[states](https://developer.hashicorp.com/terraform/plugin/best-practices/provider-code):
 
-Here, we look at what it involves and how difficult it would be to implement
-under different language / library constraints.
+>Go is currently the only programming language supported by HashiCorp for
+building Terraform providers.
+[...]
+While it is possible to write a non-Go provider, thanks to Terraform's use of
+the gRPC protocol, it is harder than it may appear at first glance. Multiple
+packages, from encoders and decoders to Terraform's type system, would all need
+to be reimplemented in that new language. The Terraform Plugin Framework would
+also need to be reimplemented, which is not a trivial challenge. And the way
+non-Go providers would interact with the Registry, terraform init, and other
+pieces of the Terraform ecosystem is unclear.
+
+This document is meant to elucidate in more detail what exactly these
+challenges involve and how one could make progress.
+
+To this end, what follows is a description of how Terraform discovers and
+interacts with providers, accompanied by some notes on how the interfaces in
+question could be implemented in different languages. The focus will be on
+scripting languages like Python, not so much on Go-like single-binary-producing
+languages like C or Rust (which would be easier to write providers in, as will
+be shown below).
 
 ## Downloading plugins & finding their executables
 
@@ -41,20 +55,26 @@ well, executable.
 
 ## Launching & communicating with plugins
 
+Terraform plugins (= providers, for now [^1]) are launched by and communicate
+with Terraform Core (= the command-line app) using a variant of the
+[RPCPlugin "protocol"](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md).[^2][^3][^4]
+The reference implementation of this protocol is the
+[go-plugin](https://github.com/hashicorp/go-plugin) Go package. I don't know of
+any other implementations (hence the need for this document).
+
 The diagram below gives an overview over what happens when Terraform launches
-and communicates with a plugin. The individual steps will be explained in more
+and communicates with a plugin. The individual steps are explained in more
 detail in this section.
 
 ![Sequence diagram](diagram.svg)
 
-### Step 1: Launching the plugin executable, passing client cert
+### Step 1: Launching plugin executable, passing client cert (handshake start)
 
-This is where the RPCPlugin involvement starts:
-
-Having found the executable, Terraform launches it as a subprocess. The first
-communication (part of what the RPCPlugin calls the handshake) happens at this
-point, because Terraform will place a temporary certificate (to be used for TLS
-in step 3) inside the `PLUGIN_CLIENT_CERT` environment variable.
+Having found a plugin executable, Terraform launches is as a subprocess. The
+first bit of communication (part of what the RPCPlugin calls the handshake)
+takes place at this point, as Terraform places a temporary certificate (to be
+used for TLS in step 3) inside the `PLUGIN_CLIENT_CERT` environment variable of
+the subprocess's execution environment.
 
 ### Step 2: Handshake response from plugin on stdout
 
@@ -95,10 +115,10 @@ new plugins).
 `$SERVER_CERT` should be replaced by a temporary certificate in the format
 described in the RPCPlugin spec, which will be used for TLS (see next step).
 
-It should be pointed out that if the final `|$SERVER_CERT` is left out,
+> 🛈 It should be pointed out that if the final `|$SERVER_CERT` is left out,
 Terraform will merrily try to connect to the plugin's RPC server anyway,
 initiating a TLS handshake as normal. I don't think this is meaningful as
-Google's RPC library doesn't even support receiving TLS requests if a server
+Google's gRPC library doesn't even support receiving TLS requests if a server
 certificate hasn't been provided (see next section).
 If one could get around this, it would likely fail down the line, so the
 certificate should be provided no matter what (this is also what the RPCPlugin
