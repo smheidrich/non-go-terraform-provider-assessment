@@ -178,7 +178,7 @@ by TLS (hence the exchange of certificates before) and the gRPC server must be
 explicitly configured to handle this, as the default behavior of Google's gRPC
 Python library is to reject such requests without even writing anything to the
 server logs / output (but the issue can be made visible by setting the
-`GRPC_TRACE=all GRPC_VERBOSITY=DEBUG` env vars[^6] on the server side).
+`GRPC_TRACE=all GRPC_VERBOSITY=DEBUG` env vars[^5] on the server side).
 
 *Non-Go difficulties:* 😌 *There shouldn't be any because Google's gRPC library
 takes care of it.*
