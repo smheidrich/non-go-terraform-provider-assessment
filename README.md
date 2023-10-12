@@ -19,10 +19,11 @@ challenges involve and how one could make progress.
 
 To this end, what follows is a description of how Terraform discovers and
 interacts with providers, accompanied by some notes on how the interfaces in
-question could be implemented in different languages. The focus will be on
-scripting languages like Python, not so much on Go-like single-binary-producing
-languages like C or Rust (which would be easier to write providers in, as will
-be shown below).
+question could be implemented in different languages and what difficulties or
+uncertainties there are.
+The focus is on scripting languages like Python, not so much on Go-like
+single-binary-producing languages like C or Rust (which would be easier to
+write providers in, as will be shown below).
 
 ## Downloading plugins & finding their executables
 
