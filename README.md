@@ -38,7 +38,7 @@ development, one should specify
 [Development Overrides](https://developer.hashicorp.com/terraform/cli/config/config-file#development-overrides-for-provider-developers)
 in one's Terraform CLI config instead.
 
-*Non-Go difficulties: ✓ I can't see any, because even though Terraform's docs
+*Non-Go difficulties:* 😏 *I can't see any, because even though Terraform's docs
 warn that providers interact with the registry, this doesn't seem to be the
 case. Maybe they were actually referring to the issues in the next section,
 which relate to the **contents** of what gets downloaded from there.*
@@ -58,7 +58,7 @@ folder names and filename.
 The executable can be an ELF file, a bash script, or anything else that's,
 well, executable.
 
-*Non-Go difficulties: ⚠ Due to the single-executable model, Terraform's
+*Non-Go difficulties:* 😟 *Due to the single-executable model, Terraform's
 registry has no concept of providers having dependencies of their own. This
 presents a problem for providers written in scripting languages, which require
 an interpreter and library dependencies to run. Our options are to either
@@ -96,7 +96,7 @@ takes place at this point, as Terraform places a temporary certificate (to be
 used for TLS in step 3) inside the `PLUGIN_CLIENT_CERT` environment variable of
 the subprocess's execution environment.
 
-*Non-Go difficulties: ✓ None. Any language can receive environment variables.*
+*Non-Go difficulties:* 😌 *None. Any language can receive environment variables.*
 
 ### Step 2: Handshake response from plugin on stdout
 
@@ -117,7 +117,7 @@ Standard error is completely ignored and not passed through to the user, so the
 above method is the only one I know of to communicate with the user at this
 stage.
 
-*Non-Go difficulties: ✓ None, and in fact, being able to pass a message using
+*Non-Go difficulties:* 😃 *None, and in fact, being able to pass a message using
 nothing but writing to stdout means that things like a check for whether the
 dependencies necessary to launch our provider are installed can be written
 as a simple shell script. Even the download and installation of these
@@ -154,7 +154,7 @@ If one could get around this, it would likely fail down the line, so the
 certificate should be provided no matter what (this is also what the RPCPlugin
 spec proscribes if a client cert is provided in the env var).
 
-*Non-Go difficulties: ✓ The format of the response is simple enough that it
+*Non-Go difficulties:* 🙂 *The format of the response is simple enough that it
 could also be produced by a shell script, although there probably wouldn't be a
 point in doing so, because at the point of the response, our actual provider
 must already be up and running anyway. Also, generating a certificate, while
@@ -180,7 +180,7 @@ Python library is to reject such requests without even writing anything to the
 server logs / output (but the issue can be made visible by setting the
 `GRPC_TRACE=all GRPC_VERBOSITY=DEBUG` env vars on the server side).
 
-*Non-Go difficulties: ✓ There shouldn't be any because Google's gRPC library
+*Non-Go difficulties:* 😌 *There shouldn't be any because Google's gRPC library
 takes care of it.*
 
 #### Health checking service
@@ -192,19 +192,19 @@ This may or may not be true (other parts of that document are definitely
 outdated, e.g. the lack of certificate in the handshake response), but it can't
 hurt.
 
-*Non-Go difficulties: ✓ There shouldn't be any. For some reason their docs
+*Non-Go difficulties:* 🙂 *There shouldn't be any. For some reason their docs
 don't link to the actual, official packages that implement this service; for
 Python, it's
 [grpcio-health-checking](https://pypi.org/project/grpcio-health-checking/)
 and there exists a [usage
-example](https://github.com/grpc/grpc/blob/ce75ec23a1a9c5239834b92da4ce0992d367a39c/examples/python/health_checking/greeter_server.py).
+example](https://github.com/grpc/grpc/blob/ce75ec23a1a9c5239834b92da4ce0992d367a39c/examples/python/health_checking/greeter_server.py).*
 
 #### gRPC / protobuf communication
 
 Then finally we are ready for the actual gRPC communication, which follows the
 format of the protobuf specs linked above. Nothing special here...
 
-*Non-Go difficulties: ✓ None, but wait for it.*
+*Non-Go difficulties:* 😸 *None, but wait for it.*
 
 #### Special protobuf fields
 
@@ -220,8 +220,8 @@ Other than that, the implementation of the [marshalling/unmarshalling
 methods](https://pkg.go.dev/github.com/hashicorp/terraform-plugin-go@v0.19.0/tfprotov6#DynamicValue)
 and further usage in Terraform's source code might be useful, too.
 
-*Non-Go difficulties: ⚠ This could be difficult although I haven't looked into
-the exact `DynamicValue` format enough to see how.*
+*Non-Go difficulties:* 😨 *This could be difficult or a lot of effort, although
+I haven't looked into the exact `DynamicValue` format enough to see how.*
 
 ### Step 4: Higher-level stuff
 
@@ -231,7 +231,7 @@ implementation and documentation for [Terraform's Plugin
 Framework](https://developer.hashicorp.com/terraform/plugin/framework) will
 have some/most of the info.
 
-*Non-Go difficulties: ⚠ This also seems like it could be difficult, although it
+*Non-Go difficulties:* 😖 *This also seems like it could be difficult, although it
 might be more amenable to trial-and-error debugging than the preceding
 lower-level parts of the protocol.*
 
