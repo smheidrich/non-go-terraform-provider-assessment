@@ -10,7 +10,7 @@ any other implementations, hence the need for this document.
 Here, we look at what it involves and how difficult it would be to implement
 under different language / library constraints.
 
-## Step 0: Downloading plugins & finding their executables
+## Downloading plugins & finding their executables
 
 ### Downloading plugins
 
@@ -39,7 +39,15 @@ folder names and filename.
 The executable can be an ELF file, a bash script, or anything else that's,
 well, executable.
 
-## Step 1: Launching the plugin executable, passing client cert
+## Launching & communicating with plugins
+
+The diagram below gives an overview over what happens when Terraform launches
+and communicates with a plugin. The individual steps will be explained in more
+detail in this section.
+
+![Sequence diagram](diagram.svg)
+
+### Step 1: Launching the plugin executable, passing client cert
 
 This is where the RPCPlugin involvement starts:
 
@@ -48,13 +56,13 @@ communication (part of what the RPCPlugin calls the handshake) happens at this
 point, because Terraform will place a temporary certificate (to be used for TLS
 in step 3) inside the `PLUGIN_CLIENT_CERT` environment variable.
 
-## Step 2: Handshake response from plugin on stdout
+### Step 2: Handshake response from plugin on stdout
 
 At this stage, the launched plugin executable can communicate with Terraform
 Core by writing to standard output, but Terraform Core will read at most 1 line
 of this before either aborting or proceeding with the next step.
 
-### In case of irrecoverable error: Write message to the user
+#### In case of irrecoverable error: Write message to the user
 
 If something is wrong and the plugin has to abort anyway, it is possible to
 pass a 1-line message explaining the situation to the user by writing something
@@ -67,7 +75,7 @@ Standard error is completely ignored and not passed through to the user, so the
 above method is the only one I know of to communicate with the user at this
 stage.
 
-### If everything is OK: Valid handshake response
+#### If everything is OK: Valid handshake response
 
 If things look OK and the plugin can proceed, it should ensure its RPC server
 is running (explained in the next step) and write a line in the following
@@ -96,7 +104,7 @@ If one could get around this, it would likely fail down the line, so the
 certificate should be provided no matter what (this is also what the RPCPlugin
 spec proscribes if a client cert is provided in the env var).
 
-## Step 3: gRPC communication
+### Step 3: gRPC communication
 
 Terraform connects to the address provided above as a
 [gRPC](https://grpc.github.io/grpc/) client.
@@ -104,7 +112,7 @@ The other end, managed by the plugin, should be a gRPC server implementing the
 latest [`tfplugin*` protobuf
 spec](https://github.com/hashicorp/terraform/tree/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol).
 
-### TLS
+#### TLS
 
 As already mentioned, Terraform will always attempt a gRPC connection secured
 by TLS (hence the exchange of certificates before) and the gRPC server must be
@@ -113,7 +121,7 @@ Python library is to reject such requests without even writing anything to the
 server logs / output (but the issue can be made visible by setting the
 `GRPC_TRACE=all GRPC_VERBOSITY=DEBUG` env vars on the server side).
 
-### Health checking service
+#### Health checking service
 
 According to an older document [^5], the plugin's gRPC server must also provide
 a [gRPC health checking](https://grpc.io/docs/guides/health-checking/) service
@@ -122,12 +130,12 @@ This may or may not be true (other parts of that document are definitely
 outdated, e.g. the lack of certificate in the handshake response), but it can't
 hurt.
 
-### gRPC / protobuf communication
+#### gRPC / protobuf communication
 
 Then finally we are ready for the actual gRPC communication, which follows the
 format of the protobuf specs linked above. Nothing special here...
 
-### Special protobuf fields
+#### Special protobuf fields
 
 ... sike! The protobuf specs contain fields of type
 [`DynamicValue`](https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/tfplugin6.4.proto#L27-L32),
@@ -141,7 +149,7 @@ Other than that, the implementation of the [marshalling/unmarshalling
 methods](https://pkg.go.dev/github.com/hashicorp/terraform-plugin-go@v0.19.0/tfprotov6#DynamicValue)
 and further usage in Terraform's source code might be useful, too.
 
-## Step 4: Higher-level stuff
+### Step 4: Higher-level stuff
 
 This part I'm not so sure about, but I guess there are higher-level rules for
 how a provider must behave that also don't really have a spec. Perhaps the
@@ -152,7 +160,7 @@ have some/most of the info.
 I'm not overly worried about this part as it should be *much* more amenable to
 trial and error than the lower-level protocol parts.
 
-# Miscellaneous resources
+## Miscellaneous resources
 
 TODO incorporate these into text / footnotes
 
