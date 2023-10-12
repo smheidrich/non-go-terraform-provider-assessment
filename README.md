@@ -75,7 +75,7 @@ is happening during provider startup, as will be clear from the next section.*
 
 ## Launching & communicating with plugins
 
-Terraform plugins (= providers, for now [^1]) are launched by and communicate
+Terraform plugins (= providers, for now[^1]) are launched by and communicate
 with Terraform Core (= the command-line app) using a variant of the
 [RPCPlugin "protocol"](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md).[^2][^3][^4]
 The reference implementation of this protocol is the
@@ -178,14 +178,14 @@ by TLS (hence the exchange of certificates before) and the gRPC server must be
 explicitly configured to handle this, as the default behavior of Google's gRPC
 Python library is to reject such requests without even writing anything to the
 server logs / output (but the issue can be made visible by setting the
-`GRPC_TRACE=all GRPC_VERBOSITY=DEBUG` env vars on the server side).
+`GRPC_TRACE=all GRPC_VERBOSITY=DEBUG` env vars[^6] on the server side).
 
 *Non-Go difficulties:* 😌 *There shouldn't be any because Google's gRPC library
 takes care of it.*
 
 #### Health checking service
 
-According to an older document [^5], the plugin's gRPC server must also provide
+According to an older document[^6], the plugin's gRPC server must also provide
 a [gRPC health checking](https://grpc.io/docs/guides/health-checking/) service
 that Terraform can query.
 This may or may not be true (other parts of that document are definitely
@@ -212,7 +212,7 @@ format of the protobuf specs linked above. Nothing special here...
 [`DynamicValue`](https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/tfplugin6.4.proto#L27-L32),
 which are central to the provider's functioning and contain JSON or
 msgpack-encoded data that must adhere to a certain format but isn't described
-in the protobuf files. [^2]
+in the protobuf files.[^2]
 There is [something that looks like a spec for
 these](https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/object-wire-format.md)
 in Terraform's repo.
@@ -248,8 +248,6 @@ TODO incorporate these into text / footnotes
 - [TLS handshake byte-by-byte
   structure](https://tls12.xargs.org/#client-hello), useful for debugging TLS
   issues in gRPC
-- [gRPC logging
-  info](https://chromium.googlesource.com/external/github.com/grpc/grpc/+/HEAD/examples/python/debug/)
 - [gRPC server credential creation
   methods](https://grpc.github.io/grpc/python/grpc.html#create-server-credentials)
 
@@ -262,4 +260,5 @@ TODO incorporate these into text / footnotes
   are to be launched. It also spans 3 different communication channels (env
   vars, stdin/stdout, and local socket connections) which are all necessary for
   its basic operation.
-[^5]: https://github.com/hashicorp/go-plugin/blob/303d84fc850fc2ad18981220339702809f8be06a/docs/guide-plugin-write-non-go.md
+[^5]: [gRPC logging info in Chromium docs](https://chromium.googlesource.com/external/github.com/grpc/grpc/+/HEAD/examples/python/debug/)
+[^6]: https://github.com/hashicorp/go-plugin/blob/303d84fc850fc2ad18981220339702809f8be06a/docs/guide-plugin-write-non-go.md
