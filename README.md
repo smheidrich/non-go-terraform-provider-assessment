@@ -156,8 +156,8 @@ spec proscribes if a client cert is provided in the env var).
 
 *Non-Go difficulties:* 🙂 *The format of the response is simple enough that it
 could also be produced by a shell script, although there probably wouldn't be a
-point in doing so, because at the point of the response, our actual provider
-must already be up and running anyway. Also, generating a certificate, while
+point in doing so, because at the time when the response is sent, the full
+provider must be up and running anyway. Also, generating a certificate, while
 possible using e.g. the `openssl` CLI tool, is probably a bit annoying to do in
 a shell script. Certainly, the certificate and response will be very simple for
 a proper scripting language like Python and the necessary cryptography
