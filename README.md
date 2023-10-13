@@ -158,6 +158,9 @@ If one could get around this, it would likely fail down the line, so the
 certificate should be provided no matter what (this is also what the RPCPlugin
 spec proscribes if a client cert is provided in the env var).
 
+After printing the handshake response, the child process must keep running
+until killed by Terraform, otherwise the latter will report and error and exit.
+
 *Non-Go difficulties:* 🙂 *The format of the response is simple enough that it
 could also be produced by a shell script, although there probably wouldn't be a
 point in doing so, because at the time when the response is sent, the full
