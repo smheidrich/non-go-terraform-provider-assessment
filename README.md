@@ -75,9 +75,9 @@ is happening during provider startup, as will be clear from the next section.*
 
 ## Launching & communicating with plugins
 
-Terraform plugins (= providers, for now[^1]) are launched by and communicate
+Terraform plugins (= providers, for now[^plugin]) are launched by and communicate
 with Terraform Core (= the command-line app) using a variant of the
-[RPCPlugin "protocol"](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md).[^2][^3][^4]
+[RPCPlugin "protocol"](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md).[^forum][^rpcpluginhashi][^proto]
 The reference implementation of this protocol is the
 [go-plugin](https://github.com/hashicorp/go-plugin) Go package. I don't know of
 any other implementations (hence the need for this document).
@@ -149,7 +149,7 @@ described in the RPCPlugin spec, which will be used for TLS (see next step).
 Terraform will merrily try to connect to the plugin's RPC server anyway,
 initiating a TLS handshake as normal. I don't think this is meaningful as
 Google's gRPC library doesn't even support receiving TLS requests if a server
-certificate hasn't been provided (see next section).
+certificate hasn't been provided[^grpcsec] (see next section).
 If one could get around this, it would likely fail down the line, so the
 certificate should be provided no matter what (this is also what the RPCPlugin
 spec proscribes if a client cert is provided in the env var).
@@ -175,17 +175,18 @@ spec](https://github.com/hashicorp/terraform/tree/bdc38b6527ee9927cee67cc992e02c
 
 As already mentioned, Terraform will always attempt a gRPC connection secured
 by TLS (hence the exchange of certificates before) and the gRPC server must be
-explicitly configured to handle this, as the default behavior of Google's gRPC
-Python library is to reject such requests without even writing anything to the
-server logs / output (but the issue can be made visible by setting the
-`GRPC_TRACE=all GRPC_VERBOSITY=DEBUG` env vars[^5] on the server side).
+explicitly instructed[^grpcsec][^grpccred] to handle this, as the default
+behavior of Google's gRPC Python library is to reject such requests without
+even writing anything to the server logs / output (but the issue can be made
+visible by setting the `GRPC_TRACE=all GRPC_VERBOSITY=DEBUG` env vars[^grpclog]
+on the server side).
 
 *Non-Go difficulties:* 😌 *There shouldn't be any because Google's gRPC library
 takes care of it.*
 
 #### Health checking service
 
-According to an older document[^6], the plugin's gRPC server must also provide
+According to an older document[^oldnongo], the plugin's gRPC server must also provide
 a [gRPC health checking](https://grpc.io/docs/guides/health-checking/) service
 that Terraform can query.
 This may or may not be true (other parts of that document are definitely
@@ -248,17 +249,17 @@ TODO incorporate these into text / footnotes
 - [TLS handshake byte-by-byte
   structure](https://tls12.xargs.org/#client-hello), useful for debugging TLS
   issues in gRPC
-- [gRPC server credential creation
-  methods](https://grpc.github.io/grpc/python/grpc.html#create-server-credentials)
 
 
-[^1]: https://developer.hashicorp.com/terraform/plugin
-[^2]: https://discuss.hashicorp.com/t/terraform-grpc-alternative-client-implementation/35825/2
-[^3]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility
-[^4]: "Protocol" is in quotes because unlike typical protocols, it specifies
+[^plugin]: [Terraform docs: Plugin overview](https://developer.hashicorp.com/terraform/plugin)
+[^forum]: [HashiCorp employee's forum post about plugin protocol and issues](https://discuss.hashicorp.com/t/terraform-grpc-alternative-client-implementation/35825/2) (from the other direction though, as the question is about implementing a *client*)
+[^rpcpluginhashi]: [RPCPlugin docs on relation to HashiCorp plugins (e.g. Terraform providers)](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility)
+[^proto]: "Protocol" is in quotes because unlike typical protocols, it specifies
   not just message formats and sequences but also the modalities of how plugins
   are to be launched. It also spans 3 different communication channels (env
   vars, stdin/stdout, and local socket connections) which are all necessary for
   its basic operation.
-[^5]: [gRPC logging info in Chromium docs](https://chromium.googlesource.com/external/github.com/grpc/grpc/+/HEAD/examples/python/debug/)
-[^6]: https://github.com/hashicorp/go-plugin/blob/303d84fc850fc2ad18981220339702809f8be06a/docs/guide-plugin-write-non-go.md
+[^grpcsec]: [gRPC docs: `add_secure_port`](https://grpc.github.io/grpc/python/grpc.html#grpc.Server.add_secure_port)
+[^grpccred]: [gRPC docs: Create Server Credentials](https://grpc.github.io/grpc/python/grpc.html#create-server-credentials)
+[^grpclog]: [gRPC logging info in Chromium docs](https://chromium.googlesource.com/external/github.com/grpc/grpc/+/HEAD/examples/python/debug/)
+[^oldnongo]: [Older document on writing non-Go plugins](https://github.com/hashicorp/go-plugin/blob/303d84fc850fc2ad18981220339702809f8be06a/docs/guide-plugin-write-non-go.md)
