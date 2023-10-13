@@ -77,11 +77,11 @@ as will be clear from the next section.*
 ## Launching & communicating with plugins
 
 Terraform plugins (= providers, for now[^plugin]) are launched by and
-communicate with Terraform Core (= the command-line app) using a variant of the
-[RPCPlugin "protocol"](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md).[^forum][^rpcpluginhashi][^proto]
-The reference implementation of this protocol is the
-[go-plugin](https://github.com/hashicorp/go-plugin) Go package. I don't know of
-any other implementations (hence the need for this document).
+communicate with Terraform Core (= the command-line app) using [a
+variant][rpcpluginhashi] of the [RPCPlugin "protocol"][rpcpluginspec].[^forum][^proto]
+The reference implementation of this protocol is the [go-plugin][goplugin] Go
+package. I don't know of any other implementations (hence the need for this
+document).
 
 The diagram below gives an overview over what happens when Terraform launches
 and communicates with a plugin. The individual steps are explained in more
@@ -144,8 +144,10 @@ plugin's RPC server is listening on (can be chosen freely) and `grpc` specifies
 the RPC protocol (a legacy option here is NetRPC, but gRPC should be used for
 new plugins).
 
-`$SERVER_CERT` should be replaced by a temporary certificate in the format
-described in the RPCPlugin spec, which will be used for TLS (see next step).
+`$SERVER_CERT` should be replaced by a temporary certificate in the [format
+described in the RPCPlugin spec][rpcpluginservercert] with the [necessary
+changes for go-plugin compatibility][rpcpluginhashiserver] applied (i.e., no
+padding). This certificate will be used for TLS (see next step).
 
 > 🛈 It should be pointed out that if the final `|$SERVER_CERT` is left out,
 Terraform will merrily try to connect to the plugin's RPC server anyway,
@@ -257,9 +259,8 @@ TODO incorporate these into text / footnotes
   issues](https://discuss.hashicorp.com/t/terraform-grpc-alternative-client-implementation/35825/2)
   (from the other direction though, as the question is about implementing a
   *client*)
-[^rpcpluginhashi]: [RPCPlugin docs on relation to HashiCorp plugins (e.g.
-  Terraform
-  providers)](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility)
+[^rpcpluginhashi]: [RPCPlugin docs on relation to HashiCorp plugins based on
+  go-plugin e.g. Terraform providers)][rpcpluginhashi]
 [^proto]: "Protocol" is in quotes because unlike typical protocols, it
   specifies not just message formats and sequences but also the modalities of
   how plugins are to be launched. Moreover, it spans 3 different communication
@@ -273,3 +274,9 @@ TODO incorporate these into text / footnotes
   docs](https://chromium.googlesource.com/external/github.com/grpc/grpc/+/HEAD/examples/python/debug/)
 [^oldnongo]: [Older document on writing non-Go
   plugins](https://github.com/hashicorp/go-plugin/blob/303d84fc850fc2ad18981220339702809f8be06a/docs/guide-plugin-write-non-go.md)
+
+[rpcpluginspec]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md
+[rpcpluginservercert]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#temporary-server-certificate
+[rpcpluginhashi]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility
+[rpcpluginhashiserver]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#go-plugin-clients-with-rpcplugin-servers
+[goplugin]: https://github.com/hashicorp/go-plugin
