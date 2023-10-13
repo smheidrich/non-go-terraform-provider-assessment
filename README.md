@@ -214,7 +214,7 @@ format of the protobuf specs linked above. Nothing special here...
 [`DynamicValue`](https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/tfplugin6.4.proto#L27-L32),
 which are central to the provider's functioning and contain JSON or
 msgpack-encoded data that must adhere to a certain format but isn't described
-in the protobuf files.[^2]
+in the protobuf files.[^forum]
 There is [something that looks like a spec for
 these](https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/object-wire-format.md)
 in Terraform's repo.
