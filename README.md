@@ -179,7 +179,8 @@ explicitly instructed[^grpcsec][^grpccred] to handle this, as the default
 behavior of Google's gRPC Python library is to reject such requests without
 even writing anything to the server logs / output (but the issue can be made
 visible by setting the `GRPC_TRACE=all GRPC_VERBOSITY=DEBUG` env vars[^grpclog]
-on the server side).
+on the server side and comparing the request bytes to a [TLS
+handshake](https://tls12.xargs.org/#client-hello)).
 
 *Non-Go difficulties:* 😌 *There shouldn't be any because Google's gRPC library
 takes care of it.*
@@ -246,12 +247,9 @@ TODO incorporate these into text / footnotes
   part)](https://github.com/hashicorp/go-plugin/blob/303d84fc850fc2ad18981220339702809f8be06a/client.go#L793)
 - [Some other in-repo plugin docs mainly concerning gRPC and
   versioning](https://github.com/hashicorp/terraform/tree/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol)
-- [TLS handshake byte-by-byte
-  structure](https://tls12.xargs.org/#client-hello), useful for debugging TLS
-  issues in gRPC
 
 
-[^plugin]: [Terraform docs: Plugin overview](https://developer.hashicorp.com/terraform/plugin)
+[^plugin]: [Terraform docs: Plugin development overview](https://developer.hashicorp.com/terraform/plugin)
 [^forum]: [HashiCorp employee's forum post about plugin protocol and issues](https://discuss.hashicorp.com/t/terraform-grpc-alternative-client-implementation/35825/2) (from the other direction though, as the question is about implementing a *client*)
 [^rpcpluginhashi]: [RPCPlugin docs on relation to HashiCorp plugins (e.g. Terraform providers)](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility)
 [^proto]: "Protocol" is in quotes because unlike typical protocols, it specifies
