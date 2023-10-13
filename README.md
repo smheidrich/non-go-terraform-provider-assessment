@@ -66,12 +66,12 @@ a) require the user to install any such dependencies themselves before using
 the provider, b) ship the interpreter and libraries with the provider, c) make
 the provider perform the installation when it first starts, or d) have our own
 miniature package manager, which users will need to install and execute before
-using our providers, take care of it. Personally, I favor (d) as the least-bad
-option, because (a) is uncomfortable for the user, (b) is bloated and
-uncomfortable for users with slow internet, and finally (c) is not only
-annoying for users who want to be confident that they'll be able to work
-offline after installation, but it's also difficult to communicate a download
-is happening during provider startup, as will be clear from the next section.*
+using our providers. Personally, I favor (d) as the least-bad option, because
+(a) is uncomfortable for the user, (b) is bloated and uncomfortable for users
+with slow internet, and finally (c) is not only annoying for users who want to
+be confident that they'll be able to work offline after installation, but it's
+also difficult to communicate a download is happening during provider startup,
+as will be clear from the next section.*
 
 ## Launching & communicating with plugins
 
