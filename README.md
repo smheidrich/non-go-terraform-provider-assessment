@@ -29,8 +29,9 @@ write providers in, as will be shown below).
 
 ### Installing plugins
 
-Users of Terraform request that Terraform load certain providers by
-putting [provider requirements](https://developer.hashicorp.com/terraform/language/providers/requirements)
+Users of Terraform request that Terraform load certain providers by putting
+[provider
+requirements](https://developer.hashicorp.com/terraform/language/providers/requirements)
 in their Terraform files.
 During `terraform init`, Terraform attempts to download them from the official
 registry, although private registries can be used instead. During provider
@@ -38,9 +39,9 @@ development, one should specify
 [Development Overrides](https://developer.hashicorp.com/terraform/cli/config/config-file#development-overrides-for-provider-developers)
 in one's Terraform CLI config instead.
 
-*Non-Go difficulties:* 😏 *I can't see any, because even though Terraform's docs
-warn that providers interact with the registry, this doesn't seem to be the
-case. Maybe they were actually referring to the issues in the next section,
+*Non-Go difficulties:* 😏 *I can't see any, because even though Terraform's
+docs warn that providers interact with the registry, this doesn't seem to be
+the case. Maybe they were actually referring to the issues in the next section,
 which relate to the **contents** of what gets downloaded from there.*
 
 ### Finding plugin executables
@@ -75,8 +76,8 @@ as will be clear from the next section.*
 
 ## Launching & communicating with plugins
 
-Terraform plugins (= providers, for now[^plugin]) are launched by and communicate
-with Terraform Core (= the command-line app) using a variant of the
+Terraform plugins (= providers, for now[^plugin]) are launched by and
+communicate with Terraform Core (= the command-line app) using a variant of the
 [RPCPlugin "protocol"](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md).[^forum][^rpcpluginhashi][^proto]
 The reference implementation of this protocol is the
 [go-plugin](https://github.com/hashicorp/go-plugin) Go package. I don't know of
@@ -90,13 +91,14 @@ detail in this section.
 
 ### Step 1: Launching plugin executable, passing client cert (handshake start)
 
-Having found a plugin executable, Terraform launches is as a subprocess. The
+Having found a plugin executable, Terraform launches it as a subprocess. The
 first bit of communication (part of what the RPCPlugin calls the handshake)
 takes place at this point, as Terraform places a temporary certificate (to be
 used for TLS in step 3) inside the `PLUGIN_CLIENT_CERT` environment variable of
 the subprocess's execution environment.
 
-*Non-Go difficulties:* 😌 *None. Any language can receive environment variables.*
+*Non-Go difficulties:* 😌 *None. Any language can retrieve environment
+variables.*
 
 ### Step 2: Handshake response from plugin on stdout
 
@@ -117,9 +119,9 @@ Standard error is completely ignored and not passed through to the user, so the
 above method is the only one I know of to communicate with the user at this
 stage.
 
-*Non-Go difficulties:* 😃 *None, and in fact, being able to pass a message using
-nothing but writing to stdout means that things like a check for whether the
-dependencies necessary to launch our provider are installed can be written
+*Non-Go difficulties:* 😃 *None, and in fact, being able to pass a message
+using nothing but writing to stdout means that things like a check for whether
+the dependencies necessary to launch our provider are installed can be written
 as a simple shell script. Even the download and installation of these
 dependencies could in theory happen here (option (c) above), but as has just
 been shown, we wouldn't be able to communicate that this is happening to the
@@ -212,12 +214,12 @@ format of the protobuf specs linked above. Nothing special here...
 
 ... sike! The protobuf specs contain fields of type
 [`DynamicValue`](https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/tfplugin6.4.proto#L27-L32),
-which are central to the provider's functioning and contain JSON or
+which are central to the provider's functioning and represent JSON or
 msgpack-encoded data that must adhere to a certain format but isn't described
 in the protobuf files.[^forum]
 There is [something that looks like a spec for
 these](https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/object-wire-format.md)
-in Terraform's repo.
+in Terraform's main repo.
 Other than that, the implementation of the [marshalling/unmarshalling
 methods](https://pkg.go.dev/github.com/hashicorp/terraform-plugin-go@v0.19.0/tfprotov6#DynamicValue)
 and further usage in Terraform's source code might be useful, too.
@@ -233,8 +235,8 @@ implementation and documentation for [Terraform's Plugin
 Framework](https://developer.hashicorp.com/terraform/plugin/framework) will
 have some/most of the info.
 
-*Non-Go difficulties:* 😖 *This also seems like it could be difficult, although it
-might be more amenable to trial-and-error debugging than the preceding
+*Non-Go difficulties:* 😖 *This also seems like it could be difficult, although
+it might be more amenable to trial-and-error debugging than the preceding
 lower-level parts of the protocol.*
 
 ## Miscellaneous resources
@@ -249,15 +251,25 @@ TODO incorporate these into text / footnotes
   versioning](https://github.com/hashicorp/terraform/tree/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol)
 
 
-[^plugin]: [Terraform docs: Plugin development overview](https://developer.hashicorp.com/terraform/plugin)
-[^forum]: [HashiCorp employee's forum post about plugin protocol and issues](https://discuss.hashicorp.com/t/terraform-grpc-alternative-client-implementation/35825/2) (from the other direction though, as the question is about implementing a *client*)
-[^rpcpluginhashi]: [RPCPlugin docs on relation to HashiCorp plugins (e.g. Terraform providers)](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility)
-[^proto]: "Protocol" is in quotes because unlike typical protocols, it specifies
-  not just message formats and sequences but also the modalities of how plugins
-  are to be launched. It also spans 3 different communication channels (env
-  vars, stdin/stdout, and local socket connections) which are all necessary for
-  its basic operation.
-[^grpcsec]: [gRPC docs: `add_secure_port`](https://grpc.github.io/grpc/python/grpc.html#grpc.Server.add_secure_port)
-[^grpccred]: [gRPC docs: Create Server Credentials](https://grpc.github.io/grpc/python/grpc.html#create-server-credentials)
-[^grpclog]: [gRPC logging info in Chromium docs](https://chromium.googlesource.com/external/github.com/grpc/grpc/+/HEAD/examples/python/debug/)
-[^oldnongo]: [Older document on writing non-Go plugins](https://github.com/hashicorp/go-plugin/blob/303d84fc850fc2ad18981220339702809f8be06a/docs/guide-plugin-write-non-go.md)
+[^plugin]: [Terraform docs: Plugin development
+  overview](https://developer.hashicorp.com/terraform/plugin)
+[^forum]: [HashiCorp employee's forum post about plugin protocol and
+  issues](https://discuss.hashicorp.com/t/terraform-grpc-alternative-client-implementation/35825/2)
+  (from the other direction though, as the question is about implementing a
+  *client*)
+[^rpcpluginhashi]: [RPCPlugin docs on relation to HashiCorp plugins (e.g.
+  Terraform
+  providers)](https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility)
+[^proto]: "Protocol" is in quotes because unlike typical protocols, it
+  specifies not just message formats and sequences but also the modalities of
+  how plugins are to be launched. Moreover, it spans 3 different communication
+  channels (env vars, stdin/stdout, and local socket connections) which are all
+  necessary for its basic operation.
+[^grpcsec]: [gRPC docs:
+  `add_secure_port`](https://grpc.github.io/grpc/python/grpc.html#grpc.Server.add_secure_port)
+[^grpccred]: [gRPC docs: Create Server
+  Credentials](https://grpc.github.io/grpc/python/grpc.html#create-server-credentials)
+[^grpclog]: [gRPC logging info in Chromium
+  docs](https://chromium.googlesource.com/external/github.com/grpc/grpc/+/HEAD/examples/python/debug/)
+[^oldnongo]: [Older document on writing non-Go
+  plugins](https://github.com/hashicorp/go-plugin/blob/303d84fc850fc2ad18981220339702809f8be06a/docs/guide-plugin-write-non-go.md)
