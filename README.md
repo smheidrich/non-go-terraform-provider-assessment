@@ -272,9 +272,9 @@ to let it retrieve its parent process ID periodically (`getppid()` on POSIX)
 and terminate when it has changed.
 
 *Non-Go difficulties:* 🙄 *Having to implement special handling for the
-parent-`SIGKILL` issue is annoying and shouldn't have been necessary had the
-client implementation been more robust. But it's not that difficult: `getppid`
-should be available in most languages, e.g. in Python via
+parent-`SIGKILL` issue is annoying and wouldn't be necessary if the client
+implementation was more robust. But it's not that difficult: `getppid` should
+be available in most languages, e.g. Python's standard library comes with
 [`os.getppid`](https://docs.python.org/3/library/os.html#os.getppid).*
 
 ## Miscellaneous resources
