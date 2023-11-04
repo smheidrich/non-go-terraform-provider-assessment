@@ -268,8 +268,12 @@ in the spec.
 The client triggers this on the server by making a
 [`plugin.ShutDown`][pluginshutdownprotobufspec] gRPC call, which is part of the
 "control" protobuf spec mentioned further above.
+If the server doesn't shut down within a short time period, the non-graceful
+shutdown explained in the next section will be attempted instead.
 
-*Non-Go difficulties:* 🙂 *Shouldn't be any.*
+*Non-Go difficulties:* 😉 *Shouldn't be any, but make sure to also implement
+proper handling of the non-graceful shutdown because the timeout is fairly
+short.*
 
 #### RPCPlugin spec termination (`SIGKILL`)
 
