@@ -138,11 +138,10 @@ format to its standard output:
 ```
 
 `1` is the handshake version (fixed), `6` is the latest protocol version as of
-2023 (see [protobuf files](https://github.com/hashicorp/terraform/tree/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol)),
-`tcp` is self-explanatory, `127.0.0.1:1234` is the address and port that the
-plugin's RPC server is listening on (can be chosen freely) and `grpc` specifies
-the RPC protocol (a legacy option here is NetRPC, but gRPC should be used for
-new plugins).
+2023 (see [protobuf files][providerprotobuffiles]), `tcp` is self-explanatory,
+`127.0.0.1:1234` is the address and port that the plugin's RPC server is
+listening on (can be chosen freely) and `grpc` specifies the RPC protocol (a
+legacy option here is NetRPC, but gRPC should be used for new plugins).
 
 `$SERVER_CERT` should be replaced by a temporary certificate in the [format
 described in the RPCPlugin spec][rpcpluginservercert] with the [necessary
@@ -208,10 +207,25 @@ Python, it's
 and there exists a [usage
 example](https://github.com/grpc/grpc/blob/ce75ec23a1a9c5239834b92da4ce0992d367a39c/examples/python/health_checking/greeter_server.py).*
 
-#### gRPC / protobuf communication
+#### gRPC / protobuf communication: Control / extra features
 
-Then finally we are ready for the actual gRPC communication, which follows the
-format of the protobuf specs linked above. Nothing special here...
+Not mentioned in the RPCPlugin spec but present in its reference implementation
+[go-plugin][goplugin] are certain RPC calls that the client can use to control
+the server and/or which provide some advanced features. These have their own
+[protobuf specs in the go-plugin repo][goplugincontrolprotobufspec].
+
+As far as I can tell, these are optional and only serve to allow for nice to
+have but not required features like graceful shutdown (explained in more detail
+further below) or stdio forwarding.
+
+*Non-Go difficulties:* 🙂 *None that I can see.*
+
+#### gRPC / protobuf communication: Provider data
+
+Finally we are ready for gRPC communication pertaining to the provider's actual
+functions, which follows the format of the [(provider) protobuf
+specs][protobuffiles] already mentioned above.
+Nothing special here...
 
 *Non-Go difficulties:* 😸 *None, but wait for it.*
 
@@ -248,10 +262,14 @@ lower-level parts of the protocol.*
 
 #### Graceful shutdown
 
-The RPCPlugin reference implementation (go-plugin) contains a [graceful plugin
-shutdown mechanism][goplugin-graceful-shutdown] not mentioned in the spec.
-I think the idea is just to shut down when the first (and only) client
-disconnects? Will have to experiment with this to find out more.
+The RPCPlugin reference implementation ([go-plugin][goplugin]) contains a
+[graceful plugin shutdown mechanism][goplugingracefulshutdown] not mentioned
+in the spec.
+The client triggers this on the server by making a
+[`plugin.ShutDown`][pluginshutdownprotobufspec] gRPC call, which is part of the
+"control" protobuf spec mentioned further above.
+
+*Non-Go difficulties:* 🙂 *Shouldn't be any.*
 
 #### RPCPlugin spec termination (`SIGKILL`)
 
@@ -312,8 +330,11 @@ TODO incorporate these into text / footnotes
   plugins](https://github.com/hashicorp/go-plugin/blob/303d84fc850fc2ad18981220339702809f8be06a/docs/guide-plugin-write-non-go.md)
 
 [rpcpluginspec]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md
+[providerprotobuffiles]: https://github.com/hashicorp/terraform/tree/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol
 [rpcpluginservercert]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#temporary-server-certificate
 [rpcpluginhashi]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility
 [rpcpluginhashiserver]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#go-plugin-clients-with-rpcplugin-servers
 [goplugin]: https://github.com/hashicorp/go-plugin
-[goplugin-graceful-shutdown]: https://github.com/hashicorp/go-plugin/blob/017b758bf4d495212a55db3de61b2d95ab104e53/client.go#L496-L515
+[goplugincontrolprotobufspec]: https://github.com/hashicorp/go-plugin/tree/017b758bf4d495212a55db3de61b2d95ab104e53/internal/plugin
+[goplugingracefulshutdown]: https://github.com/hashicorp/go-plugin/blob/017b758bf4d495212a55db3de61b2d95ab104e53/client.go#L496-L515
+[pluginshutdownprotobufspec]: https://github.com/hashicorp/go-plugin/blob/017b758bf4d495212a55db3de61b2d95ab104e53/internal/plugin/grpc_controller.proto#L13
