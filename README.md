@@ -316,4 +316,4 @@ TODO incorporate these into text / footnotes
 [rpcpluginhashi]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility
 [rpcpluginhashiserver]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#go-plugin-clients-with-rpcplugin-servers
 [goplugin]: https://github.com/hashicorp/go-plugin
-[goplugin-graceful-shutdown](https://github.com/hashicorp/go-plugin/blob/017b758bf4d495212a55db3de61b2d95ab104e53/client.go#L496-L515)
+[goplugin-graceful-shutdown]: https://github.com/hashicorp/go-plugin/blob/017b758bf4d495212a55db3de61b2d95ab104e53/client.go#L496-L515
