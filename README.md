@@ -244,6 +244,39 @@ have some/most of the info.
 it might be more amenable to trial-and-error debugging than the preceding
 lower-level parts of the protocol.*
 
+### Step 5: Termination
+
+#### Graceful shutdown
+
+The RPCPlugin reference implementation (go-plugin) contains a [graceful plugin
+shutdown mechanism][goplugin-graceful-shutdown] not mentioned in the spec.
+I think the idea is just to shut down when the first (and only) client
+disconnects? Will have to experiment with this to find out more.
+
+#### RPCPlugin spec termination (`SIGKILL`)
+
+The RPCPlugin spec specifies that clients stop servers by `SIGKILL`ing them.
+This may only happen when no RPC calls are still running and means that, during
+such times, the provider must not perform any operations that mess things up
+when suddenly interrupted.
+
+There is another consequence relevant for providers launched by e.g. a shell
+script: `SIGKILL` kills a process but not its children, so in this case, it
+would kill the shell script's process but not the actual provider process.
+Experimentation has shown that Terraform then waits indefinitely for the
+children to terminate, which never happens unless special arrangements are made
+to handle this situation.
+There are [multiple ways](https://stackoverflow.com/a/23587108) to let a child
+process terminate when its parent gets killed, the easiest of which is probably
+to let it retrieve its parent process ID periodically (`getppid()` on POSIX)
+and terminate when it has changed.
+
+*Non-Go difficulties:* 🙄 *Having to implement special handling for the
+parent-`SIGKILL` issue is annoying and shouldn't have been necessary had the
+client implementation been more robust. But it's not that difficult: `getppid`
+should be available in most languages, e.g. in Python via
+[`os.getppid`](https://docs.python.org/3/library/os.html#os.getppid).*
+
 ## Miscellaneous resources
 
 TODO incorporate these into text / footnotes
@@ -283,3 +316,4 @@ TODO incorporate these into text / footnotes
 [rpcpluginhashi]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility
 [rpcpluginhashiserver]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#go-plugin-clients-with-rpcplugin-servers
 [goplugin]: https://github.com/hashicorp/go-plugin
+[goplugin-graceful-shutdown](https://github.com/hashicorp/go-plugin/blob/017b758bf4d495212a55db3de61b2d95ab104e53/client.go#L496-L515)
