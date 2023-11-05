@@ -331,6 +331,15 @@ started manually in a separate terminal for debugging, you'll also have to set
 own console logs. Note that the output is *very* verbose, so this only makes
 sense to use for difficult, lower-level gRPC issues.
 
+## Issues that may occur
+
+- If Terraform Core crashes while the provider is running, it may leave the
+  provider running, which will lead to hard-to-debug issues caused by it still
+  listening on its port. Weirdly, the gRPC listener set up by the next launch
+  doesn't fail due to "port already in use" as one would expect. I have no idea
+  how exactly that can happen, but killing the orphaned provider processes
+  fixed it.
+
 ## Miscellaneous resources
 
 TODO incorporate these into text / footnotes
