@@ -311,6 +311,15 @@ implementation was more robust. But it's not that difficult: `getppid` should
 be available in most languages, e.g. Python's standard library comes with
 [`os.getppid`](https://docs.python.org/3/library/os.html#os.getppid).*
 
+## Debugging
+
+You won't get *anywhere* without the `TF_LOG=debug` and `TF_LOG=trace` env var
+settings, which make the Terraform CLI print out more detailed information
+about what is happening as it communicates with the provider.
+
+In particular, both will log the provider's stderr messages which are otherwise
+swallowed, and `trace` will log which RPC calls are being made to the provider.
+
 ## Miscellaneous resources
 
 TODO incorporate these into text / footnotes
