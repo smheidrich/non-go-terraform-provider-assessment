@@ -228,7 +228,16 @@ further below) or stdio forwarding.
 Finally we are ready for gRPC communication pertaining to the provider's actual
 functions, which follows the format of the [(provider) protobuf
 specs][protobuffiles] already mentioned above.
-Nothing special here...
+
+Terraform's docs come with a [nice, human-readable
+overview](https://developer.hashicorp.com/terraform/plugin/framework/internals/rpcs)
+over the RPC calls, which helpfully also lists which Terraform CLI
+commands trigger them.
+
+From experimentation, it turns out that that some of them that seem like they
+should be triggered by mere inclusion of a provider in a project, e.g. provider
+schema validation, are in fact only triggered if a provider is actually used by
+resources or data sources in the current Terraform project.
 
 *Non-Go difficulties:* 😸 *None, but wait for it.*
 
