@@ -143,10 +143,13 @@ format to its standard output:
 listening on (can be chosen freely) and `grpc` specifies the RPC protocol (a
 legacy option here is NetRPC, but gRPC should be used for new plugins).
 
-`$SERVER_CERT` should be replaced by a temporary certificate in the [format
-described in the RPCPlugin spec][rpcpluginservercert] with the [necessary
-changes for go-plugin compatibility][rpcpluginhashiserver] applied (i.e., no
-padding). This certificate will be used for TLS (see next step).
+`$SERVER_CERT` should be replaced by a temporary certificate, ideally adhering
+to RPCPlugin's certificate [requirements][rpcpluginservercertreqs] (although in
+my testing most of them weren't actually required), in the [format described in
+the RPCPlugin spec][rpcpluginservercert], and with the [necessary changes for
+go-plugin compatibility][rpcpluginhashiserver] applied (i.e., no base64
+padding, which can be achieved by adding dummy data to text fields). This
+certificate will be used for TLS (see next step).
 
 > 🛈 It should be pointed out that if the final `|$SERVER_CERT` is left out,
 Terraform will merrily try to connect to the plugin's RPC server anyway,
@@ -336,6 +339,7 @@ TODO incorporate these into text / footnotes
 [rpcpluginspec]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md
 [providerprotobuffiles]: https://github.com/hashicorp/terraform/tree/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol
 [rpcpluginservercert]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#temporary-server-certificate
+[rpcpluginservercertreqs]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#temporary-keys-and-certificates
 [rpcpluginhashi]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility
 [rpcpluginhashiserver]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#go-plugin-clients-with-rpcplugin-servers
 [goplugin]: https://github.com/hashicorp/go-plugin
