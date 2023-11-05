@@ -313,12 +313,23 @@ be available in most languages, e.g. Python's standard library comes with
 
 ## Debugging
 
+### Terraform
+
 You won't get *anywhere* without the `TF_LOG=debug` and `TF_LOG=trace` env var
 settings, which make the Terraform CLI print out more detailed information
 about what is happening as it communicates with the provider.
 
 In particular, both will log the provider's stderr messages which are otherwise
 swallowed, and `trace` will log which RPC calls are being made to the provider.
+
+### gRPC
+
+To debug the provider-side gRPC, the `GRPC_TRACE=all GRPC_VERBOSITY=DEBUG` env
+vars were already mentioned. If your provider is launched by Terraform and not
+started manually in a separate terminal for debugging, you'll also have to set
+`TF_LOG=debug` or `TF_LOG=trace` to let Terraform forward this output to its
+own console logs. Note that the output is *very* verbose, so this only makes
+sense to use for difficult, lower-level gRPC issues.
 
 ## Miscellaneous resources
 
