@@ -261,9 +261,9 @@ How to (de)serialize these to represent a type is also
 in the spec mentioned above.
 
 The spec mentions that a provider must support deserializing either JSON or
-msgpack-encoded `DynamicValue`s and `types`s, but should always produce them in
-msgpack format itself, although in the Terraform Core implementation, `type`
-[seems to always get deserialized from
+msgpack-encoded `DynamicValue`s, but should always produce them in msgpack
+format itself, although in the Terraform Core implementation, `type` [seems to
+always get deserialized from
 JSON](https://github.com/hashicorp/terraform/blob/8a085b427b74ce3829500a59508b77465f1bbef0/internal/plugin6/convert/schema.go#L129).
 
 *Non-Go difficulties:* 😨 *This could be difficult or a lot of effort, although
