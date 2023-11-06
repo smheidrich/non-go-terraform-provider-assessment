@@ -227,7 +227,7 @@ further below) or stdio forwarding.
 
 Finally we are ready for gRPC communication pertaining to the provider's actual
 functions, which follows the format of the [(provider) protobuf
-specs][protobuffiles] already mentioned above.
+specs][providerprotobuffiles] already mentioned above.
 
 Terraform's docs come with a [nice, human-readable
 overview](https://developer.hashicorp.com/terraform/plugin/framework/internals/rpcs)
@@ -248,15 +248,26 @@ resources or data sources in the current Terraform project.
 which are central to the provider's functioning and represent JSON or
 msgpack-encoded data that must adhere to a certain format but isn't described
 in the protobuf files.[^forum]
-There is [something that looks like a spec for
-these](https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/object-wire-format.md)
-in Terraform's main repo.
+There is [a spec for these][dynamicvaluespec] in Terraform's main repo.
 Other than that, the implementation of the [marshalling/unmarshalling
 methods](https://pkg.go.dev/github.com/hashicorp/terraform-plugin-go@v0.19.0/tfprotov6#DynamicValue)
 and further usage in Terraform's source code might be useful, too.
 
+Relatedly, schema attributes returned by providers contain a [`type`
+field](https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/tfplugin6.4.proto#L95)
+whose protobuf type is just `bytes`.
+How to (de)serialize these to represent a type is also
+[explained](https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/object-wire-format.md#schemaattribute-mapping-rules-for-messagepack)
+in the spec mentioned above.
+
+The spec mentions that a provider must support deserializing either JSON or
+msgpack-encoded `DynamicValue`s and `types`s, but should always produce them in
+msgpack format itself, although in the Terraform Core implementation, `type`
+[seems to always get deserialized from
+JSON](https://github.com/hashicorp/terraform/blob/8a085b427b74ce3829500a59508b77465f1bbef0/internal/plugin6/convert/schema.go#L129).
+
 *Non-Go difficulties:* 😨 *This could be difficult or a lot of effort, although
-I haven't looked into the exact `DynamicValue` format enough to see how.*
+I haven't looked into the exact format enough to see how.*
 
 ### Step 4: Higher-level stuff
 
@@ -380,6 +391,7 @@ TODO incorporate these into text / footnotes
 [rpcpluginservercertreqs]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#temporary-keys-and-certificates
 [rpcpluginhashi]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#hashicorp-go-plugin-compatibility
 [rpcpluginhashiserver]: https://github.com/rpcplugin/spec/blob/e73dcf973a3fc589cc8687bf1bee6765ef134270/rpcplugin-spec.md#go-plugin-clients-with-rpcplugin-servers
+[dynamicvaluespec]: https://github.com/hashicorp/terraform/blob/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol/object-wire-format.md
 [goplugin]: https://github.com/hashicorp/go-plugin
 [goplugincontrolprotobufspec]: https://github.com/hashicorp/go-plugin/tree/017b758bf4d495212a55db3de61b2d95ab104e53/internal/plugin
 [goplugingracefulshutdown]: https://github.com/hashicorp/go-plugin/blob/017b758bf4d495212a55db3de61b2d95ab104e53/client.go#L496-L515
