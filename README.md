@@ -234,6 +234,10 @@ overview](https://developer.hashicorp.com/terraform/plugin/framework/internals/r
 over the RPC calls, which helpfully also lists which Terraform CLI
 commands trigger them.
 
+More details on the meaning of each field can be found in the
+[terraform-plugin-go
+docs](https://pkg.go.dev/github.com/hashicorp/terraform-plugin-go@v0.19.0/tfprotov6).
+
 From experimentation, it turns out that that some of them that seem like they
 should be triggered by mere inclusion of a provider in a project, e.g. provider
 schema validation, are in fact only triggered if a provider is actually used by
