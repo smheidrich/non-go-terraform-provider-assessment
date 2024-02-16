@@ -1,5 +1,5 @@
-> **NOTE:** There are some non-Go implementations after all - skip to the
-> "Implementations" section at the end to find out more.
+> ⚠️ **NOTE:** There are some non-Go implementations after all! Skip to the
+> **[Implementations](#implementations-update)** section at the end to find out more.
 
 # How difficult is it to write a Terraform provider in a language other than Go?
 
