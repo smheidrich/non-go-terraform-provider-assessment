@@ -362,7 +362,7 @@ sense to use for difficult, lower-level gRPC issues.
 
 Since I wrote this, two things have happened:
 
-- I started working on a library for writing Terraform providers in Python,
+- I started working on a library for writing Terraform providers in **Python**,
   [tfprovider-python](https://github.com/smheidrich/tfprovider-python), plus
   a tool to package and launch such providers,
   [terradep-python](https://pypi.org/project/terradep-python/).
@@ -373,7 +373,7 @@ Since I wrote this, two things have happened:
   [terraform-provider-github-fine-grained-token](https://github.com/smheidrich/terraform-provider-github-fine-grained-token)
   (only runs on amd64 Linux machines).
 - After a lot of work on the above, I did find someone else had already written
-  a prototype provider in Rust,
+  a prototype provider in **Rust**,
   [terraform-provider-helloworld](https://github.com/palfrey/terraform-provider-helloworld).
   I haven't really looked into it but expect it's far cleaner than what I
   wrote.
