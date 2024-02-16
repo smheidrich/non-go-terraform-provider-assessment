@@ -1,3 +1,6 @@
+> **NOTE:** There are some non-Go implementations after all - skip to the
+> "Implementations" section at the end to find out more.
+
 # How difficult is it to write a Terraform provider in a language other than Go?
 
 Terraform's documentation on writing new providers
@@ -355,6 +358,26 @@ sense to use for difficult, lower-level gRPC issues.
   how exactly that can happen, but killing the orphaned provider processes
   fixed it.
 
+## Implementations (UPDATE)
+
+Since I wrote this, two things have happened:
+
+- I started working on a library for writing Terraform providers in Python,
+  [tfprovider-python](https://github.com/smheidrich/tfprovider-python), plus
+  a tool to package and launch such providers,
+  [terradep-python](https://pypi.org/project/terradep-python/).
+  Unfortunately, as of February 2024, neither of these are in a state that
+  makes them sensible for others to use, and I've put work on them on hold for
+  now. For the morbidly curious, I managed to get one small provider to work
+  *on my system* using these,
+  [terraform-provider-github-fine-grained-token](https://github.com/smheidrich/terraform-provider-github-fine-grained-token)
+  (only runs on amd64 Linux machines).
+- After a lot of work on the above, I did find someone else had already written
+  a prototype provider in Rust,
+  [terraform-provider-helloworld](https://github.com/palfrey/terraform-provider-helloworld).
+  I haven't really looked into it but expect it's far cleaner than what I
+  wrote.
+
 ## Miscellaneous resources
 
 TODO incorporate these into text / footnotes
@@ -365,7 +388,6 @@ TODO incorporate these into text / footnotes
   part)](https://github.com/hashicorp/go-plugin/blob/303d84fc850fc2ad18981220339702809f8be06a/client.go#L793)
 - [Some other in-repo plugin docs mainly concerning gRPC and
   versioning](https://github.com/hashicorp/terraform/tree/bdc38b6527ee9927cee67cc992e02cc199f3cae1/docs/plugin-protocol)
-
 
 [^plugin]: [Terraform docs: Plugin development
   overview](https://developer.hashicorp.com/terraform/plugin)
