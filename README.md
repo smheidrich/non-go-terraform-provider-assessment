@@ -1,5 +1,6 @@
 > ⚠️ **NOTE:** There are some non-Go implementations after all! Skip to the
-> **[Implementations](#implementations-update)** section at the end to find out more.
+> **[Implementations](#implementations-updates)** section at the end to find
+> out more.
 
 # How difficult is it to write a Terraform provider in a language other than Go?
 
@@ -358,9 +359,22 @@ sense to use for difficult, lower-level gRPC issues.
   how exactly that can happen, but killing the orphaned provider processes
   fixed it.
 
-## Implementations (UPDATE)
+## Implementations (UPDATES)
 
-Since I wrote this, two things have happened:
+### Update 2025-07
+
+By now, other people have developed more mature frameworks / libraries than the
+ones described in the previous update, which support creating providers not
+only for Terraform proper but also its [OpenTofu](https://opentofu.org/) fork:
+
+- For writing providers in **Python**, there is now the
+  **[tf](https://pypi.org/project/tf/)** framework.
+- For writing providers in **Rust**, there is the
+  **[tf-provider](https://crates.io/crates/tf-provider)** library.
+
+### Update 2024-02
+
+Since I first wrote this text, two things have happened:
 
 - I started working on a library for writing Terraform providers in **Python**,
   [tfprovider-python](https://github.com/smheidrich/tfprovider-python), plus
