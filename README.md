@@ -162,7 +162,7 @@ Google's gRPC library doesn't even support receiving TLS requests if a server
 certificate hasn't been provided[^grpcsec] (see next section).
 If one could get around this, it would likely fail down the line, so the
 certificate should be provided no matter what (this is also what the RPCPlugin
-spec proscribes if a client cert is provided in the env var).
+spec prescribes if a client cert is provided in the env var).
 
 After printing the handshake response, the child process must keep running
 until killed by Terraform, otherwise the latter will report an error and exit.
